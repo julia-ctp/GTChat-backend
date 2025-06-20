@@ -4,6 +4,9 @@ require('dotenv').config()
 const apiUrl = process.env.API_URL
 const apiKey = process.env.API_KEY
 
-const supabase = createClient(apiKey, apiUrl, {db: chat})
-
+const supabase = createClient(apiUrl, apiKey, {
+    db: {
+        schema: 'public'
+    }
+})
 module.exports = supabase

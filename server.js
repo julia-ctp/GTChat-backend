@@ -1,18 +1,24 @@
-const express = require('express')
-const MsgRouter = require('./routes/MsgRouter')
-require('dotenv').config()
+const express = require('express');
+const cors = require('cors');
+const RoomRouter = require('./routes/RoomRoute');
+const MsgRouter = require('./routes/MsgRoute');
+const AuthRouter = require('./routes/AuthRoute');
+require('dotenv').config();
 
-const PORT = process.env.PORT
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-const app = express()
+app.use(cors());
+app.use(express.json());
 
-app.use(express.json())
-app.use(MsgRouter)
+app.use(RoomRouter);
+app.use(MsgRouter);
+app.use(AuthRouter);
 
 app.get('/', (req, res) => {
-    res.send('qualquer coisa')
-})
+    res.send('API Supabase funcionando!');
+});
 
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta http://localhost:${PORT}`)
-})
+    console.log(`Servidor rodando em: http://localhost:${PORT}`);
+});

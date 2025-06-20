@@ -1,41 +1,70 @@
 const MsgModel = require('../models/MsgModel')
+const supabase = require('../config/supabase')
 
 class MsgController {
-    read(req, res) {
-        const msg = MsgModel.read()
-        return res.json(msg)
+    async getAll(req, res) {
+        try {
+            const msgs = await MsgModel.getAll();
+            console.log(msgs)
+            return res.json(msgs);
+        } catch (err) {
+            return res.status(500).json({ message: 'Erro ao buscar mensagens', error: err.message });
+        }
     }
 
-    getById(req, res) {
-        const id = req.params.id
-        return res.json(MsgModel.getById(id))
+    async getById(req, res) {
+        try {
+            const id = req.params.id
+            const msg = await MsgModel.getById(id)
+            if (!msg) return res.status(404).json({ message: 'Mensagem não encontrada' })
+            return res.json(msg)
+        } catch (err) {
+            return res.status(500).json({ message: 'Erro ao buscar mensagem', error: err.message })
+        }
     }
 
-    create(req, res) {
-        const id = req.params.id
-        const body = req.body
-        MsgModel.create(id, body)
-        return res.status(200).json({
-            message: 'Mensagem criada com sucesso'
-        })
+    async create(req, res) {
+        try {
+            // console.log('user autenticado:', req.user)
+            const { content, groupid } =  req.body
+            const { data: userData, error: userError} = await supabase
+                .from('users')
+                .select('avatar_url')
+                .eq('id', req.user.id)
+                .single()
+
+            const avatarUrl = 'https://hawwfnlfgyrrdngwmuef.supabase.co/storage/v1/object/public/profile//photo-final.webp'
+
+            const newMsg = await MsgModel.create({
+                userid: req.user.id,
+                content,
+                groupid,
+                user_name: req.user.name,
+                user_profile_img: avatarUrl
+            })
+            return res.status(201).json({ data: newMsg, message: 'Mensagem criada com sucesso!' })
+        } catch (err) {
+            return res.status(500).json({ message: 'Erro ao criar mensagem', error: err.message })
+        }
     }
 
-    update(req, res) {
-        const id = req.params.id
-        const body = req.body
-        MsgModel.update(id, body)
-        return res.json({
-            message: 'Mensagem atualizada com sucesso'
-        })
+    async update(req, res) {
+        try {
+            const updatedMsg = await MsgModel.update(req.params.id, req.body)
+            return res.json({ data: updatedMsg, message: 'Mensagem atualizada com sucesso!' })
+        } catch (err) {
+            return res.status(500).json({ message: 'Erro ao atualizar mensagem', error: err.message })
+        }
     }
 
-    delete(req, res) {
-        const id = req.params.id 
-        MsgModel.delete(id)
-        return res.json({
-            message: 'Mensagem deletada com sucesso'
-        })
+    async delete(req, res) {
+        try {
+            await MsgModel.delete(req.params.id)
+            return res.json({ message: 'Mensagem deletada com sucesso!' })
+        } catch (err) {
+            return res.status(500).json({ message: 'Erro ao deletar mensagem', error: err.message })
+        }
     }
 }
 
-module.exports = MsgController
+module.exports = MsgController;
