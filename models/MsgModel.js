@@ -3,8 +3,9 @@ const supabase = require('../config/supabase');
 class MsgModel {
     static async getAll() {
         const { data, error } = await supabase.from('messages').select('*');
-        console.log(data)
         if (error) throw error;
+        console.log(data);
+        
         return data;
     }
 

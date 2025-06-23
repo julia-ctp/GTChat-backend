@@ -1,7 +1,7 @@
 const express = require('express');
 const supabase = require('../config/supabase');
-
 const RoomRouter = express.Router();
+
 
 RoomRouter.get('/salas', async (req, res) => {
   const { data, error } = await supabase.from('rooms').select('*');

@@ -6,7 +6,7 @@ const SECRET = process.env.JWT_SECRET || 'chave_secreta_muito_segura';
 
 class AuthController {
   async register(req, res) {
-    const { name, email, password } = req.body;
+    const { name, email, password, avatar_url } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Nome, email e senha são obrigatórios.' });
@@ -17,7 +17,7 @@ class AuthController {
 
       const { data, error } = await supabase
         .from('users')
-        .insert([{ name, email, password: hashedPassword }])
+        .insert([{ name, email, password: hashedPassword, avatar_url }])
         .select();
 
       if (error) throw error;
